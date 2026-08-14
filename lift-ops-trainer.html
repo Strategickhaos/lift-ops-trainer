@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIFT OPS · Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --steel:#14171a; --steel-2:#1c2126; --steel-3:#262d34;
+  --line:#3a444e; --line-hot:#57646f;
+  --text:#e6e9ec; --dim:#95a1ab; --faint:#67737d;
+  --hazard:#f2b705; --hazard-dk:#8a6a06;
+  --stop:#d9483b; --go:#4f9d5d; --info:#4a8fc7;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--steel); color:var(--text);
+  font-family:'Roboto Mono',ui-monospace,monospace; font-size:14px; line-height:1.5;
+  padding-bottom:76px;
+}
+.hazard-bar{height:7px;background:repeating-linear-gradient(45deg,var(--hazard) 0 12px,#101315 12px 24px)}
+header{padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+h1{font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:-.02em;line-height:1}
+h1 span{color:var(--hazard)}
+.sub{font-size:10.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+.warn{
+  margin:12px 16px;padding:10px 12px;border:1px solid var(--stop);
+  border-left-width:4px;font-size:11.5px;color:#f0b7b0;line-height:1.55;
+}
+.warn b{color:var(--stop)}
+main{padding:0 16px}
+section{display:none} section.on{display:block}
+h2{font-family:'Archivo Black',sans-serif;font-size:15px;margin:20px 0 4px;letter-spacing:.01em}
+h2:first-child{margin-top:16px}
+.hint{font-size:11px;color:var(--faint);margin-bottom:12px;line-height:1.55}
+
+/* checklist */
+.seg{display:flex;gap:6px;margin:12px 0}
+.seg button{
+  flex:1;background:var(--steel-2);border:1px solid var(--line);color:var(--dim);
+  font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:9px 4px;cursor:pointer
+}
+.seg button.on{background:var(--hazard);border-color:var(--hazard);color:#12140f;font-weight:700}
+.grp{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+  margin:16px 0 6px;padding-bottom:4px;border-bottom:1px dashed var(--line)}
+.item{display:flex;gap:11px;align-items:flex-start;padding:10px 2px;border-bottom:1px solid #232a30;cursor:pointer}
+.chk{flex:0 0 20px;height:20px;border:2px solid var(--line-hot);margin-top:1px;display:grid;place-items:center;font-size:13px;color:transparent}
+.item.done .chk{background:var(--go);border-color:var(--go);color:#0d1a0f}
+.item.done .lbl{color:var(--faint);text-decoration:line-through}
+.lbl{flex:1;font-size:13px}
+.crit{font-size:9px;color:var(--stop);border:1px solid var(--stop);padding:1px 4px;letter-spacing:.06em;align-self:center}
+.tally{position:sticky;bottom:76px;background:var(--steel-3);border:1px solid var(--line);
+  padding:10px 12px;margin-top:14px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.tally b{font-family:'Archivo Black',sans-serif;font-size:17px}
+.verdict{font-size:11px;letter-spacing:.1em}
+.v-ok{color:var(--go)} .v-no{color:var(--stop)}
+
+/* inputs */
+.f{margin:11px 0}
+.f label{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--dim);margin-bottom:4px}
+.f input,.f select{
+  width:100%;background:var(--steel);border:1px solid var(--line);border-left:3px solid var(--line-hot);
+  color:var(--text);font:inherit;font-size:16px;padding:10px 11px
+}
+.f input:focus,.f select:focus{outline:none;border-color:var(--hazard);border-left-color:var(--hazard)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* readout */
+.out{border:1px solid var(--line);background:var(--steel-2);margin-top:14px}
+.out-hd{background:var(--steel-3);padding:8px 12px;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line)}
+.out-bd{padding:13px 12px}
+.big{font-family:'Archivo Black',sans-serif;font-size:32px;line-height:1;letter-spacing:-.01em}
+.big.ok{color:var(--go)} .big.no{color:var(--stop)} .big.na{color:var(--faint)}
+.unit{font-family:'Roboto Mono';font-size:13px;color:var(--dim);font-weight:400}
+.kv{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #232a30}
+.kv:last-child{border:0}
+.kv span:last-child{font-variant-numeric:tabular-nums}
+.verd{margin-top:11px;padding:9px 11px;font-size:12px;line-height:1.5}
+.verd.ok{border:1px solid var(--go);color:#b7dcbf}
+.verd.no{border:1px solid var(--stop);color:#f0b7b0}
+.verd.na{border:1px solid var(--line);color:var(--dim)}
+
+svg{width:100%;height:auto;display:block;background:var(--steel);border:1px solid var(--line);margin-top:12px}
+
+/* quiz */
+.q{border:1px solid var(--line);background:var(--steel-2);padding:13px;margin-bottom:11px}
+.qn{font-size:9.5px;letter-spacing:.16em;color:var(--faint);margin-bottom:7px}
+.qt{font-size:13.5px;margin-bottom:11px;line-height:1.5}
+.opt{display:block;width:100%;text-align:left;background:var(--steel);border:1px solid var(--line);
+  color:var(--text);font:inherit;font-size:13px;padding:10px 11px;margin-bottom:6px;cursor:pointer}
+.opt:hover{border-color:var(--line-hot)}
+.opt.pick{border-color:var(--hazard);border-left:3px solid var(--hazard)}
+.opt.right{border-color:var(--go);background:#16241a}
+.opt.wrong{border-color:var(--stop);background:#241514}
+.why{font-size:11.5px;color:var(--dim);border-left:2px solid var(--line-hot);padding:7px 0 7px 10px;margin-top:8px;line-height:1.55;display:none}
+.why.show{display:block}
+.score{border:1px solid var(--hazard);padding:14px;text-align:center;margin-bottom:14px}
+.score b{font-family:'Archivo Black',sans-serif;font-size:34px;display:block;color:var(--hazard)}
+
+button.act{background:transparent;border:1px solid var(--line-hot);color:var(--dim);font:inherit;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 16px;cursor:pointer;width:100%;margin-top:10px}
+button.act:hover{border-color:var(--hazard);color:var(--hazard)}
+button.act.pri{border-color:var(--hazard);color:var(--hazard)}
+
+nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--steel-2);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{background:none;border:0;color:var(--faint);font:inherit;font-size:9.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:13px 2px;cursor:pointer;border-top:3px solid transparent}
+nav button.on{color:var(--hazard);border-top-color:var(--hazard)}
+nav .ico{display:block;font-size:17px;margin-bottom:3px}
+footer{padding:22px 16px 10px;font-size:10.5px;color:var(--faint);line-height:1.7;border-top:1px solid var(--line);margin-top:26px}
+</style>
+</head>
+<body>
+<div class="hazard-bar"></div>
+
+<header>
+  <h1>LIFT <span>OPS</span></h1>
+  <div class="sub">Boom lift · Forklift · Study bench</div>
+</header>
+
+<div class="warn">
+  <b>NOT A CERTIFICATION.</b> OSHA requires formal instruction, practical hands-on training, and an
+  evaluation by a qualified person on the specific machine (1910.178(l) forklift · 1926.453 aerial lift).
+  No app satisfies that. Use this to study — the data plate, the operator manual, and your evaluator govern.
+</div>
+
+<main>
+
+<!-- ══ INSPECTION ══ -->
+<section id="s-insp" class="on">
+  <h2>Pre-Use Inspection</h2>
+  <p class="hint">Required before each shift. Anything marked CRITICAL that fails means tag out and do not operate.</p>
+  <div class="seg">
+    <button data-mach="boom" class="on">JLG Boom</button>
+    <button data-mach="fork">Forklift</button>
+  </div>
+  <div id="checklist"></div>
+  <div class="tally">
+    <span id="tallyTxt">0 of 0 checked</span>
+    <span class="verdict" id="tallyVerd">—</span>
+  </div>
+  <button class="act" id="resetChk">Reset checklist</button>
+</section>
+
+<!-- ══ CAPACITY ══ -->
+<section id="s-cap">
+  <h2>Forklift Capacity</h2>
+  <p class="hint">Rated capacity is stated at a specific load center (commonly 24 in). Push the load center out and
+  usable capacity drops. This estimates the derate — <b>the data plate on your machine is the authority.</b></p>
+
+  <div class="row">
+    <div class="f"><label>Rated capacity (lb)</label><input type="number" id="ratedCap" value="5000" inputmode="numeric"></div>
+    <div class="f"><label>Rated load center (in)</label><input type="number" id="ratedLC" value="24" inputmode="numeric"></div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Actual load weight (lb)</label><input type="number" id="loadWt" value="3200" inputmode="numeric"></div>
+    <div class="f"><label>Actual load center (in)</label><input type="number" id="actLC" value="36" inputmode="numeric"></div>
+  </div>
+  <div class="f"><label>Attachment weight, if any (lb)</label><input type="number" id="attWt" value="0" inputmode="numeric"></div>
+
+  <div class="out">
+    <div class="out-hd">Estimated allowable at actual load center</div>
+    <div class="out-bd">
+      <div class="big" id="capBig">—</div>
+      <div style="margin-top:11px">
+        <div class="kv"><span>Derate factor</span><span id="capFactor">—</span></div>
+        <div class="kv"><span>Effective load (load + attachment)</span><span id="capEff">—</span></div>
+        <div class="kv"><span>Margin remaining</span><span id="capMargin">—</span></div>
+      </div>
+      <div class="verd na" id="capVerd">Enter values above.</div>
+    </div>
+  </div>
+
+  <h2>Stability Triangle</h2>
+  <p class="hint">A counterbalanced forklift pivots on three points — both front wheels and the center of the rear
+  axle. The combined center of gravity must stay inside that triangle. Raising and reaching push it forward;
+  turning pushes it sideways.</p>
+  <svg viewBox="0 0 320 250" id="triSvg" aria-label="Stability triangle diagram"></svg>
+  <div class="f"><label>Tilt / turn severity — <span id="turnVal">0</span></label>
+    <input type="range" id="turnSlider" min="-100" max="100" value="0" style="padding:0;border:0"></div>
+  <div class="verd na" id="triVerd">Adjust load and turn to see the CG move.</div>
+</section>
+
+<!-- ══ CLEARANCE ══ -->
+<section id="s-clr">
+  <h2>Power Line Clearance</h2>
+  <p class="hint">Aerial lifts must keep a minimum distance from energized lines. These figures are a
+  <b>starting reference only</b> — verify against the current OSHA text and your site's electrical safe work
+  permit before any lift near conductors. When voltage is unknown, treat it as energized at the highest
+  plausible level.</p>
+
+  <div class="f"><label>Line voltage</label>
+    <select id="kv">
+      <option value="u">UNKNOWN — treat as worst case</option>
+      <option value="50">Up to 50 kV</option>
+      <option value="200">Over 50 up to 200 kV</option>
+      <option value="350">Over 200 up to 350 kV</option>
+      <option value="500">Over 350 up to 500 kV</option>
+      <option value="750">Over 500 up to 750 kV</option>
+      <option value="1000">Over 750 up to 1000 kV</option>
+    </select>
+  </div>
+  <div class="f"><label>Your planned closest approach (ft)</label><input type="number" id="approach" value="12" inputmode="decimal"></div>
+
+  <div class="out">
+    <div class="out-hd">Minimum approach distance</div>
+    <div class="out-bd">
+      <div class="big" id="madBig">—</div>
+      <div class="verd na" id="madVerd">Select a voltage.</div>
+    </div>
+  </div>
+
+  <h2>Fall Protection — the one people get wrong</h2>
+  <div class="out"><div class="out-bd" style="font-size:12.5px;line-height:1.65">
+    <b style="color:var(--hazard)">Boom lift</b> — full body harness with a lanyard anchored to the manufacturer's
+    anchor point in the platform. Required. A boom can catapult an occupant on a sudden stop or bounce.<br><br>
+    <b style="color:var(--hazard)">Scissor lift</b> — the guardrail system is the fall protection. A harness is not
+    universally required, but follow the manufacturer and your site rule.<br><br>
+    Never anchor to an adjacent structure, never climb the rails, and keep both feet on the platform floor.
+  </div></div>
+</section>
+
+<!-- ══ QUIZ ══ -->
+<section id="s-quiz">
+  <h2>Knowledge Check</h2>
+  <p class="hint">Wrong answers explain themselves. Aim to understand the why, not memorize the letter.</p>
+  <div id="scoreBox"></div>
+  <div id="quiz"></div>
+  <button class="act pri" id="gradeBtn">Grade</button>
+  <button class="act" id="resetQuiz">Reset</button>
+</section>
+
+<footer>
+  Study aid only. Not affiliated with JLG or any manufacturer. Regulatory figures may change and vary by
+  jurisdiction and site rule — verify against current OSHA text, the machine's operator manual, and the
+  data plate before operating. Your qualified evaluator has the final word.
+</footer>
+</main>
+
+<nav>
+  <button data-sec="s-insp" class="on"><span class="ico">☑</span>Inspect</button>
+  <button data-sec="s-cap"><span class="ico">⚖</span>Capacity</button>
+  <button data-sec="s-clr"><span class="ico">⚡</span>Clearance</button>
+  <button data-sec="s-quiz"><span class="ico">?</span>Quiz</button>
+</nav>
+
+<script>
+/* ── nav ── */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.sec));
+  window.scrollTo(0,0);
+});
+
+/* ── checklists ── */
+const LISTS={
+  boom:[
+    ['Walk-around · before start',[
+      ['Operator manual present in platform',1],
+      ['All decals legible, capacity chart readable',1],
+      ['No visible cracks or damage to boom, welds, turntable',1],
+      ['Tires and wheels sound; lug nuts tight',0],
+      ['No hydraulic leaks under machine or at cylinders',1],
+      ['Fluid levels — hydraulic, fuel, coolant, oil',0],
+      ['Battery secure, terminals clean',0],
+      ['Platform gate and guardrails intact, gate self-closes',1],
+      ['Harness anchor point present and undamaged',1],
+      ['Harness and lanyard inspected, in date, no cuts or burns',1],
+    ]],
+    ['Function test · from ground controls',[
+      ['Ground control station operates all functions',1],
+      ['Emergency stop at ground works',1],
+      ['Auxiliary / emergency lowering works',1],
+      ['Tilt alarm and horn sound',0],
+    ]],
+    ['Function test · from platform',[
+      ['Platform E-stop works',1],
+      ['Footswitch / enable required for motion',1],
+      ['All boom functions smooth, no drift when released',1],
+      ['Drive and steer respond correctly both directions',0],
+      ['Backup alarm and beacon operate',0],
+    ]],
+    ['Work area',[
+      ['Ground assessed — slope, holes, soft fill, drop-offs',1],
+      ['Overhead scan — lines, pipe rack, steel, structures',1],
+      ['Barricades / spotter for traffic and pedestrians',0],
+      ['Wind speed within manufacturer limit',1],
+    ]],
+  ],
+  fork:[
+    ['Engine off · visual',[
+      ['Data plate present and legible',1],
+      ['Forks — no cracks, bent tips, or excessive heel wear',1],
+      ['Fork locking pins engaged',1],
+      ['Mast chains even tension, no damage, lubricated',1],
+      ['Carriage and backrest secure',0],
+      ['Overhead guard intact, no cracks',1],
+      ['Tires — condition, pressure if pneumatic',0],
+      ['No hydraulic leaks, hoses not chafed',1],
+      ['Fluid levels checked',0],
+      ['Seat belt functional and not frayed',1],
+      ['LP tank secure and in date, or battery secure',1],
+    ]],
+    ['Engine running · operational',[
+      ['Gauges and warning lights normal',0],
+      ['Service brake holds',1],
+      ['Parking brake holds on grade',1],
+      ['Steering full travel, no excessive play',1],
+      ['Horn works',1],
+      ['Lights and backup alarm work',0],
+      ['Lift, lower, tilt, side-shift smooth; mast does not drift down',1],
+      ['Seat presence switch stops functions when unoccupied',1],
+    ]],
+    ['Work area',[
+      ['Travel path clear, floor condition sound',0],
+      ['Overhead clearance verified for mast height',1],
+      ['Pedestrian routes and blind corners identified',1],
+      ['Load stable, within capacity, centered on forks',1],
+    ]],
+  ],
+};
+let mach='boom', state={boom:{},fork:{}};
+
+function drawList(){
+  const wrap=document.getElementById('checklist');
+  let h='', i=0;
+  for(const [grp,items] of LISTS[mach]){
+    h+=`<div class="grp">${grp}</div>`;
+    for(const [txt,crit] of items){
+      const k=i++, on=state[mach][k];
+      h+=`<div class="item ${on?'done':''}" data-k="${k}"><div class="chk">✓</div>
+        <div class="lbl">${txt}</div>${crit?'<span class="crit">CRITICAL</span>':''}</div>`;
+    }
+  }
+  wrap.innerHTML=h;
+  wrap.querySelectorAll('.item').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.k; state[mach][k]=!state[mach][k]; drawList();
+  });
+  // tally
+  let tot=0,done=0,critTot=0,critDone=0,j=0;
+  for(const [,items] of LISTS[mach]) for(const [,crit] of items){
+    tot++; if(crit)critTot++;
+    if(state[mach][j]){done++; if(crit)critDone++;}
+    j++;
+  }
+  document.getElementById('tallyTxt').textContent=`${done} of ${tot} checked · ${critDone}/${critTot} critical`;
+  const v=document.getElementById('tallyVerd');
+  if(critDone===critTot&&done===tot){v.textContent='READY';v.className='verdict v-ok';}
+  else if(critDone<critTot){v.textContent='CRITICAL ITEMS OPEN';v.className='verdict v-no';}
+  else {v.textContent='IN PROGRESS';v.className='verdict';}
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));
+  mach=b.dataset.mach; drawList();
+});
+document.getElementById('resetChk').onclick=()=>{state[mach]={};drawList();};
+drawList();
+
+/* ── capacity ── */
+const $=id=>document.getElementById(id);
+const num=id=>parseFloat($(id).value)||0;
+function calcCap(){
+  const rc=num('ratedCap'), rlc=num('ratedLC'), lw=num('loadWt'), alc=num('actLC'), aw=num('attWt');
+  const big=$('capBig'), verd=$('capVerd');
+  if(!rc||!rlc||!alc){ big.textContent='—'; big.className='big na';
+    $('capFactor').textContent='—';$('capEff').textContent='—';$('capMargin').textContent='—';
+    verd.className='verd na'; verd.textContent='Enter rated capacity, rated load center, and actual load center.';
+    drawTri(0,0); return; }
+  const factor = alc<=rlc ? 1 : rlc/alc;
+  const allow = Math.round(rc*factor);
+  const eff = lw+aw;
+  const margin = allow-eff;
+  $('capFactor').textContent = factor.toFixed(3);
+  $('capEff').textContent = eff.toLocaleString()+' lb';
+  $('capMargin').textContent = (margin>=0?'+':'')+margin.toLocaleString()+' lb';
+  big.textContent = allow.toLocaleString();
+  big.innerHTML = allow.toLocaleString()+' <span class="unit">lb</span>';
+  if(!eff){ big.className='big na'; verd.className='verd na'; verd.textContent='Enter a load weight to check margin.'; }
+  else if(margin<0){ big.className='big no'; verd.className='verd no';
+    verd.innerHTML=`<b>OVER CAPACITY by ${Math.abs(margin).toLocaleString()} lb.</b> Do not lift. Reduce the load, bring the load center in, or use a larger machine.`; }
+  else if(margin < allow*0.1){ big.className='big ok'; verd.className='verd no';
+    verd.innerHTML=`Within capacity but under 10% margin. Very little room for error — reassess before lifting.`; }
+  else { big.className='big ok'; verd.className='verd ok';
+    verd.textContent=`Within estimated capacity. Confirm against the data plate, and remember the plate derates further for attachments and raised height.`; }
+  drawTri(eff && allow ? Math.min(eff/allow,1.35) : 0, parseInt($('turnSlider').value)/100);
+}
+['ratedCap','ratedLC','loadWt','actLC','attWt'].forEach(id=>$(id).oninput=calcCap);
+$('turnSlider').oninput=()=>{ $('turnVal').textContent=$('turnSlider').value; calcCap(); };
+
+function drawTri(loadRatio, turn){
+  // triangle: front axle across the bottom, rear pivot at top
+  const FX1=45,FY=205, FX2=275, RX=160,RY=45;
+  // CG: base near centre, moves toward front axle as load ratio grows, sideways with turn
+  const t=Math.min(loadRatio,1.35);
+  const cy = RY + (FY-RY)*(0.42 + 0.52*t);
+  const cx = RX + turn*78*(0.45+0.55*t);
+  // inside test
+  const sign=(ax,ay,bx,by,cx2,cy2)=>(ax-cx2)*(by-cy2)-(bx-cx2)*(ay-cy2);
+  const d1=sign(cx,cy,FX1,FY,FX2,FY), d2=sign(cx,cy,FX2,FY,RX,RY), d3=sign(cx,cy,RX,RY,FX1,FY);
+  const neg=(d1<0)||(d2<0)||(d3<0), pos=(d1>0)||(d2>0)||(d3>0);
+  const inside=!(neg&&pos);
+  const col = inside ? (t>1 ? '#f2b705' : '#4f9d5d') : '#d9483b';
+  document.getElementById('triSvg').innerHTML=`
+    <polygon points="${FX1},${FY} ${FX2},${FY} ${RX},${RY}"
+      fill="${inside?'rgba(79,157,93,.10)':'rgba(217,72,59,.12)'}" stroke="${col}" stroke-width="2"/>
+    <circle cx="${FX1}" cy="${FY}" r="6" fill="#57646f"/>
+    <circle cx="${FX2}" cy="${FY}" r="6" fill="#57646f"/>
+    <circle cx="${RX}" cy="${RY}" r="6" fill="#57646f"/>
+    <text x="${FX1-6}" y="${FY+22}" fill="#67737d" font-size="9" font-family="Roboto Mono">FRONT L</text>
+    <text x="${FX2-34}" y="${FY+22}" fill="#67737d" font-size="9" font-family="Roboto Mono">FRONT R</text>
+    <text x="${RX-38}" y="${RY-12}" fill="#67737d" font-size="9" font-family="Roboto Mono">REAR PIVOT</text>
+    <line x1="${RX}" y1="${RY}" x2="${cx}" y2="${cy}" stroke="#3a444e" stroke-dasharray="3 3"/>
+    <circle cx="${cx}" cy="${cy}" r="9" fill="${col}"/>
+    <circle cx="${cx}" cy="${cy}" r="15" fill="none" stroke="${col}" stroke-width="1" opacity=".5"/>
+    <text x="${cx+20}" y="${cy+4}" fill="${col}" font-size="10" font-family="Roboto Mono">CG</text>`;
+  const v=document.getElementById('triVerd');
+  if(!t){ v.className='verd na'; v.textContent='Enter a load above to see the centre of gravity shift.'; }
+  else if(!inside){ v.className='verd no'; v.innerHTML='<b>CG outside the triangle — tip-over condition.</b> Lower the load, straighten out, and slow down. Illustrative model only.'; }
+  else if(t>0.9||Math.abs(turn)>0.65){ v.className='verd no'; v.textContent='CG near an edge. Small inputs cause big shifts here — reduce speed, lower the load, avoid turning while elevated.'; }
+  else { v.className='verd ok'; v.textContent='CG inside the triangle. Note how quickly it travels once the load approaches capacity.'; }
+}
+calcCap();
+
+/* ── clearance ── */
+// Reference table, kept as data so it can be checked against the reg rather than trusted.
+const MAD={'50':10,'200':15,'350':20,'500':25,'750':35,'1000':45};
+function calcMad(){
+  const sel=$('kv').value, ap=parseFloat($('approach').value);
+  const big=$('madBig'), verd=$('madVerd');
+  const req = sel==='u' ? 45 : MAD[sel];
+  big.innerHTML = req+' <span class="unit">ft minimum</span>';
+  if(sel==='u'){
+    big.className='big no';
+    verd.className='verd no';
+    verd.innerHTML='<b>Voltage unknown.</b> Shown as the worst-case figure. Do not plan a lift near unidentified conductors — get the voltage confirmed and a permit before any approach.';
+    return;
+  }
+  if(isNaN(ap)){ big.className='big na'; verd.className='verd na'; verd.textContent='Enter your planned approach distance.'; return; }
+  if(ap<req){ big.className='big no'; verd.className='verd no';
+    verd.innerHTML=`<b>TOO CLOSE by ${(req-ap).toFixed(1)} ft.</b> Stop. Reposition, de-energize, or get the line covered and permitted. Remember the boom, the platform, the operator, and any tool or material all count.`; }
+  else if(ap<req+5){ big.className='big ok'; verd.className='verd no';
+    verd.textContent='Clears the minimum, but with little buffer. Boom drift, wind sway, and line sag all eat into that. Add margin and use a dedicated spotter.'; }
+  else { big.className='big ok'; verd.className='verd ok';
+    verd.textContent='Clears the reference minimum. Still confirm against the site permit and use a spotter with an unobstructed view.'; }
+}
+$('kv').onchange=calcMad; $('approach').oninput=calcMad; calcMad();
+
+/* ── quiz ── */
+const QS=[
+ {q:'Your forklift data plate reads 5,000 lb at a 24 in load center. A pallet has its center of gravity 48 in from the fork face. Roughly what can you safely lift?',
+  o:['Still 5,000 lb — the plate is the plate','About 2,500 lb','About 4,000 lb','You cannot lift it at all'],a:1,
+  w:'Doubling the load center roughly halves capacity: 5,000 × (24/48) ≈ 2,500 lb. The data plate is the authority and derates further for attachments and lift height.'},
+ {q:'You are in a boom lift platform. What fall protection is required?',
+  o:['Guardrails alone are sufficient','Full body harness with lanyard anchored in the platform','A body belt clipped to the rail','Nothing, if you stay seated'],a:1,
+  w:'Boom lifts can catapult an occupant on a sudden stop or bounce, so a full body harness anchored to the manufacturer anchor is required. Body belts are not acceptable for fall arrest. Scissor lifts differ — there the guardrails are the system.'},
+ {q:'You are asked to work near an overhead line and nobody can tell you the voltage. What do you do?',
+  o:['Assume it is a normal distribution line and keep 10 ft','Treat it as energized at the highest plausible voltage and stop until it is confirmed','Touch the boom to it briefly to test','Work at night when demand is lower'],a:1,
+  w:'Unknown voltage means worst case and no approach. Get the voltage confirmed, the line de-energized or covered, and a permit issued. Distribution and transmission lines look similar from the ground.'},
+ {q:'What are the three points of a counterbalanced forklift stability triangle?',
+  o:['Both front wheels and both rear wheels','Both front wheels and the center of the rear axle','The mast base and both rear wheels','The two forks and the operator seat'],a:1,
+  w:'The rear axle pivots, so the effective third point is its center, not the two rear wheels. This is why a forklift feels stable straight ahead and gets unstable in a turn.'},
+ {q:'When does a forklift become MOST unstable?',
+  o:['Traveling straight with the load low','Turning while the load is raised','Parked with the mast tilted back','Reversing slowly on level ground'],a:1,
+  w:'Raising the load moves the combined CG up and forward; turning adds lateral force. Together they walk the CG toward the edge of the triangle. Travel with the load low and tilted back, and do not turn while elevated.'},
+ {q:'You find a hydraulic leak at a boom cylinder during your pre-use inspection. What is the correct action?',
+  o:['Note it and run the shift, report at the end','Top up the reservoir and monitor it','Tag the machine out of service and do not operate','Operate at reduced height only'],a:2,
+  w:'A leak at a cylinder is a critical defect — a failure while elevated is not survivable in the way a slow drip suggests. Tag out, remove from service, and report it. Pre-use inspection only matters if a failure actually stops the machine from being used.'},
+ {q:'Who is permitted to perform your OSHA-required operator evaluation?',
+  o:['Any coworker who has run the machine longer than you','A qualified person with the knowledge, training, and experience to evaluate competence','An online training vendor by video','Yourself, once you have read the manual'],a:1,
+  w:'OSHA requires training and evaluation by a person with the knowledge, training, and experience to both train and evaluate. Certification is machine-specific and must be refreshed — commonly every three years for powered industrial trucks, and sooner after an incident or observed unsafe operation.'},
+ {q:'On a rough-terrain boom lift, what does the tilt alarm mean?',
+  o:['You may continue if you drive slowly','The machine is on a slope beyond its limit — retract and lower before repositioning','It only matters when the boom is stowed','It is an advisory you can silence'],a:1,
+  w:'The alarm means the chassis is past the slope limit for the boom position you are in. Elevated on a slope is how these machines go over. Retract and lower first, then reposition on level, compacted ground.'},
+];
+let picks={}, graded=false;
+function drawQuiz(){
+  document.getElementById('quiz').innerHTML=QS.map((q,i)=>`
+    <div class="q"><div class="qn">Question ${i+1} of ${QS.length}</div><div class="qt">${q.q}</div>
+    ${q.o.map((o,j)=>{
+      let c='opt';
+      if(graded){ if(j===q.a)c+=' right'; else if(picks[i]===j)c+=' wrong'; }
+      else if(picks[i]===j)c+=' pick';
+      return `<button class="${c}" data-q="${i}" data-o="${j}">${String.fromCharCode(65+j)}. ${o}</button>`;
+    }).join('')}
+    <div class="why ${graded?'show':''}">${q.w}</div></div>`).join('');
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(graded)return; picks[b.dataset.q]=+b.dataset.o; drawQuiz();
+  });
+}
+document.getElementById('gradeBtn').onclick=()=>{
+  graded=true;
+  const right=QS.reduce((n,q,i)=>n+(picks[i]===q.a?1:0),0);
+  const pct=Math.round(right/QS.length*100);
+  document.getElementById('scoreBox').innerHTML=
+    `<div class="score"><b>${pct}%</b>${right} of ${QS.length} correct${pct<100?' — read the explanations on the ones you missed.':' — now go prove it on the machine.'}</div>`;
+  drawQuiz(); window.scrollTo(0,0);
+};
+document.getElementById('resetQuiz').onclick=()=>{
+  picks={};graded=false;document.getElementById('scoreBox').innerHTML='';drawQuiz();window.scrollTo(0,0);
+};
+drawQuiz();
+</script>
+</body>
+</html>
