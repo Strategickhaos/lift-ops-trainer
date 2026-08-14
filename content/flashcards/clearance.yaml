@@ -1,0 +1,12 @@
+kind: flash_deck
+title: Power Line Clearance & Fall Protection
+cards:
+  - front: Voltage is unknown. What do you do?
+    back: Treat as worst-case. Do not approach until voltage is confirmed, line is de-energized or covered, and a permit is issued.
+    tags: [mad, unknown]
+  - front: Boom lift fall protection rule (the one people get wrong)
+    back: Full-body harness + lanyard anchored to the manufacturer’s anchor point in the platform. Required. Guardrails alone are not enough on a boom.
+    tags: [harness, boom]
+  - front: Scissor lift fall protection
+    back: The guardrail system is normally the fall protection. Follow the manufacturer and site rule; harness is not universally required.
+    tags: [scissor]

@@ -1,0 +1,58 @@
+kind: checklist
+machine: boom
+title: JLG Boom Lift Pre-Use Inspection
+groups:
+  - name: Walk-around · before start
+    items:
+      - text: Operator manual present in platform
+        critical: true
+      - text: All decals legible, capacity chart readable
+        critical: true
+      - text: No visible cracks or damage to boom, welds, turntable
+        critical: true
+      - text: Tires and wheels sound; lug nuts tight
+        critical: false
+      - text: No hydraulic leaks under machine or at cylinders
+        critical: true
+      - text: Fluid levels — hydraulic, fuel, coolant, oil
+        critical: false
+      - text: Battery secure, terminals clean
+        critical: false
+      - text: Platform gate and guardrails intact, gate self-closes
+        critical: true
+      - text: Harness anchor point present and undamaged
+        critical: true
+      - text: Harness and lanyard inspected, in date, no cuts or burns
+        critical: true
+  - name: Function test · from ground controls
+    items:
+      - text: Ground control station operates all functions
+        critical: true
+      - text: Emergency stop at ground works
+        critical: true
+      - text: Auxiliary / emergency lowering works
+        critical: true
+      - text: Tilt alarm and horn sound
+        critical: false
+  - name: Function test · from platform
+    items:
+      - text: Platform E-stop works
+        critical: true
+      - text: Footswitch / enable required for motion
+        critical: true
+      - text: All boom functions smooth, no drift when released
+        critical: true
+      - text: Drive and steer respond correctly both directions
+        critical: false
+      - text: Backup alarm and beacon operate
+        critical: false
+  - name: Work area
+    items:
+      - text: Ground assessed — slope, holes, soft fill, drop-offs
+        critical: true
+      - text: Overhead scan — lines, pipe rack, steel, structures
+        critical: true
+      - text: Barricades / spotter for traffic and pedestrians
+        critical: false
+      - text: Wind speed within manufacturer limit
+        critical: true

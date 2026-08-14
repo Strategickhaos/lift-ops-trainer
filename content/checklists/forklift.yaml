@@ -1,0 +1,56 @@
+kind: checklist
+machine: forklift
+title: Rough-Terrain Forklift / Telehandler Pre-Use Inspection
+groups:
+  - name: Engine off · visual
+    items:
+      - text: Data plate present and legible
+        critical: true
+      - text: Forks — no cracks, bent tips, or excessive heel wear
+        critical: true
+      - text: Fork locking pins engaged
+        critical: true
+      - text: Mast chains even tension, no damage, lubricated
+        critical: true
+      - text: Carriage and backrest secure
+        critical: false
+      - text: Overhead guard intact, no cracks
+        critical: true
+      - text: Tires — condition, pressure if pneumatic
+        critical: false
+      - text: No hydraulic leaks, hoses not chafed
+        critical: true
+      - text: Fluid levels checked
+        critical: false
+      - text: Seat belt functional and not frayed
+        critical: true
+      - text: LP tank secure and in date, or battery secure
+        critical: true
+  - name: Engine running · operational
+    items:
+      - text: Gauges and warning lights normal
+        critical: false
+      - text: Service brake holds
+        critical: true
+      - text: Parking brake holds on grade
+        critical: true
+      - text: Steering full travel, no excessive play
+        critical: true
+      - text: Horn works
+        critical: true
+      - text: Lights and backup alarm work
+        critical: false
+      - text: Lift, lower, tilt, side-shift smooth; mast does not drift down
+        critical: true
+      - text: Seat presence switch stops functions when unoccupied
+        critical: true
+  - name: Work area
+    items:
+      - text: Travel path clear, floor condition sound
+        critical: false
+      - text: Overhead clearance verified for mast height
+        critical: true
+      - text: Pedestrian routes and blind corners identified
+        critical: true
+      - text: Load stable, within capacity, centered on forks
+        critical: true

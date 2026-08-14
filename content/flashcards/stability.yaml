@@ -1,0 +1,18 @@
+kind: flash_deck
+title: Stability Triangle & Tip-Over
+cards:
+  - front: What three points form the stability triangle on a counterbalanced forklift / telehandler?
+    back: Both front wheels and the center of the rear axle (the rear axle pivots).
+    tags: [stability, triangle]
+  - front: What happens to the combined center of gravity when you raise a load?
+    back: It moves up and forward, shrinking the effective stability margin.
+    tags: [cg, raise]
+  - front: When is a telehandler most unstable?
+    back: Turning while the load is raised — lateral force + elevated CG.
+    tags: [tip-over]
+  - front: What does the LSI (Load Stability Indication) red zone mean?
+    back: Forward load capability has been reached. Only allowed functions are retract boom and lift boom.
+    tags: [lsi, jlg]
+  - front: Load chart capacities assume what ground condition?
+    back: Firm, level, non-yielding support. Soft ground or slope reduces real capacity.
+    tags: [load-chart, ground]

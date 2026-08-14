@@ -1,0 +1,12 @@
+kind: flash_deck
+title: Capacity & Load Center
+cards:
+  - front: Data plate says 5,000 lb at 24 in load center. Load CG is at 48 in. Rough capacity?
+    back: ≈ 2,500 lb (capacity scales roughly with 24/actual load center). Always confirm on the plate for that machine.
+    tags: [derate]
+  - front: What is the governing capacity when using an attachment?
+    back: The lowest of: attachment rating, fork rating × number of forks, telehandler chart for that config, any site derate.
+    tags: [attachment]
+  - front: Why do load charts drop capacity at max height + max reach?
+    back: That corner produces the highest tip-over moment. The chart already accounts for it — stay inside the zone.
+    tags: [reach, height]

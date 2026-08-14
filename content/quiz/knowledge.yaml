@@ -1,0 +1,27 @@
+kind: quiz
+title: Core Knowledge Check
+questions:
+  - prompt: Your forklift data plate reads 5,000 lb at a 24 in load center. A pallet has its center of gravity 48 in from the fork face. Roughly what can you safely lift?
+    options:
+      - Still 5,000 lb — the plate is the plate
+      - About 2,500 lb
+      - About 4,000 lb
+      - You cannot lift it at all
+    answer: 1
+    explanation: Doubling the load center roughly halves capacity. 5,000 × (24/48) ≈ 2,500 lb. The data plate is the authority and derates further for attachments and lift height.
+  - prompt: You are in a boom lift platform. What fall protection is required?
+    options:
+      - Guardrails alone are sufficient
+      - Full body harness with lanyard anchored in the platform
+      - A body belt clipped to the rail
+      - Nothing, if you stay seated
+    answer: 1
+    explanation: Boom lifts can catapult an occupant on a sudden stop or bounce, so a full body harness anchored to the manufacturer anchor is required. Body belts are not acceptable for fall arrest.
+  - prompt: What are the three points of a counterbalanced forklift stability triangle?
+    options:
+      - Both front wheels and both rear wheels
+      - Both front wheels and the center of the rear axle
+      - The mast base and both rear wheels
+      - The two forks and the operator seat
+    answer: 1
+    explanation: The rear axle pivots, so the effective third point is its center, not the two rear wheels.

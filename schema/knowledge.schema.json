@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lift Ops Knowledge Document",
+  "oneOf": [
+    { "$ref": "#/definitions/checklist" },
+    { "$ref": "#/definitions/flash_deck" },
+    { "$ref": "#/definitions/quiz" }
+  ],
+  "definitions": {
+    "checklist": {
+      "type": "object",
+      "required": ["kind", "machine", "title", "groups"],
+      "properties": {
+        "kind": { "const": "checklist" },
+        "machine": { "type": "string" },
+        "title": { "type": "string" },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "items"],
+            "properties": {
+              "name": { "type": "string" },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["text"],
+                  "properties": {
+                    "text": { "type": "string" },
+                    "critical": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flash_deck": {
+      "type": "object",
+      "required": ["kind", "title", "cards"],
+      "properties": {
+        "kind": { "const": "flash_deck" },
+        "title": { "type": "string" },
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["front", "back"],
+            "properties": {
+              "front": { "type": "string" },
+              "back": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "quiz": {
+      "type": "object",
+      "required": ["kind", "title", "questions"],
+      "properties": {
+        "kind": { "const": "quiz" },
+        "title": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["prompt", "options", "answer", "explanation"],
+            "properties": {
+              "prompt": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "answer": { "type": "integer", "minimum": 0 },
+              "explanation": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
